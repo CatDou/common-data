@@ -8,6 +8,7 @@ import com.github.shootercheng.parse.parse.error.DefaultErrorRecord;
 import com.github.shootercheng.parse.parse.error.ErrorRecord;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,9 +16,13 @@ import java.util.Map;
  *
  */
 public class ParseParam {
+    private int headLine;
+
     private int startLine;
 
     private int sheetNum;
+
+    private Map<String, List<String>> fieldHeadMap;
 
     private Map<String, Method> fieldSetterMap;
 
@@ -127,5 +132,23 @@ public class ParseParam {
 
     public int getBatchNum() {
         return batchNum;
+    }
+
+    public int getHeadLine() {
+        return headLine;
+    }
+
+    public ParseParam setHeadLine(int headLine) {
+        this.headLine = headLine;
+        return this;
+    }
+
+    public Map<String, List<String>> getFieldHeadMap() {
+        return fieldHeadMap;
+    }
+
+    public ParseParam setFieldHeadMap(Map<String, List<String>> fieldHeadMap) {
+        this.fieldHeadMap = fieldHeadMap;
+        return this;
     }
 }

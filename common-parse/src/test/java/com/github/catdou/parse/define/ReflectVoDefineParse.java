@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.catdou.parse.model.ReflectVo;
 import com.github.shootercheng.parse.param.ParseParam;
 import com.github.shootercheng.parse.parse.define.RowDefineParse;
-import com.github.shootercheng.parse.utils.ExcelUtil;
+import com.github.shootercheng.common.util.ExcelUtil;
 import org.apache.poi.ss.usermodel.Row;
 
 

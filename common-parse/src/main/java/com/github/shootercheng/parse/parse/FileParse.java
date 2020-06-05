@@ -14,8 +14,11 @@ public interface FileParse {
     <T> List<T> parseFile(String filePath, Class<T> clazz, ParseParam parseParam);
 
     default void checkParam(ParseParam parseParam) {
-        if (parseParam.getFieldSetterMap() == null ||
-                parseParam.getFieldSetterMap().size() == 0) {
+        boolean fieldSetter = parseParam.getFieldSetterMap() == null ||
+                parseParam.getFieldSetterMap().size() == 0;
+        boolean fieldHeadMap = parseParam.getFieldHeadMap() == null ||
+                parseParam.getFieldHeadMap().size() == 0;
+        if ( !fieldSetter || !fieldHeadMap) {
             throw new IllegalArgumentException("please check field setter mapper");
         }
     }

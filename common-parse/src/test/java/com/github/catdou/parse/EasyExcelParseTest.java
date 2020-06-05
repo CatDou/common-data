@@ -30,7 +30,7 @@ public class EasyExcelParseTest extends ParseCommonTest {
         ParseParam parseParam = createDemoParam();
         FileParse fileParse = FileParseCreateor.createFileParse(FileParseCommonUtil.findParserType(filePath, parseParam));
         List<DemoData> demoDataList = fileParse.parseFile(filePath, DemoData.class, parseParam);
-        System.out.println(demoDataList);
+        Assert.assertTrue(demoDataList.size() > 0);
     }
 
     @Test
@@ -39,7 +39,7 @@ public class EasyExcelParseTest extends ParseCommonTest {
         ParseParam parseParam = createDemoParam();
         FileParse fileParse = FileParseCreateor.createFileParse(FileParseCommonUtil.findParserType(filePath, parseParam));
         List<DemoData> demoDataList = fileParse.parseFile(filePath, DemoData.class, parseParam);
-        System.out.println(demoDataList);
+        Assert.assertTrue(demoDataList.size() > 0);
     }
 
     @Test

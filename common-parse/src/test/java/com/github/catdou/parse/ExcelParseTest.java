@@ -4,18 +4,24 @@ import com.github.catdou.parse.model.ExcelTypeVo;
 import com.github.catdou.parse.model.MergeDataVo;
 import com.github.catdou.parse.model.ReflectVo;
 import com.github.shootercheng.common.util.DataUtil;
+import com.github.shootercheng.common.util.ExcelUtil;
 import com.github.shootercheng.parse.constant.ParseType;
 import com.github.shootercheng.parse.param.ParseParam;
 import com.github.shootercheng.parse.parse.FileParse;
 import com.github.shootercheng.parse.parse.FileParseCreateor;
 import com.github.shootercheng.parse.utils.FileParseCommonUtil;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 /**
  * @author chengdu
@@ -103,4 +109,48 @@ public class ExcelParseTest extends ParseCommonTest {
         System.out.println(resultMap);
     }
 
+    @Test
+    public void testPoi() {
+        String filePath = "file/test2003.xls";
+        Workbook workbook = ExcelUtil.getWorkBook(filePath);
+        Sheet sheet = workbook.getSheetAt(0);
+        for (Row row : sheet) {
+            int rowNum = row.getRowNum();
+            System.out.println("row :" + rowNum);
+            StringJoiner stringJoiner = new StringJoiner(",","(",")");
+            row.forEach(cell -> {
+                String cellValue = ExcelUtil.getCellValue(cell);
+                stringJoiner.add(cellValue);
+            });
+            System.out.println(stringJoiner);
+        }
+    }
+
+    public ParseParam createHeadMapParam() {
+        Map<String, List<String>> fieldHeadMap = new HashMap<>(16);
+        fieldHeadMap.put("id", Arrays.asList("id".toLowerCase(), "序号"));
+        fieldHeadMap.put("userName", Arrays.asList("userName".toLowerCase(), "姓名"));
+        fieldHeadMap.put("score", Arrays.asList("score".toLowerCase(), "分数"));
+        fieldHeadMap.put("date", Arrays.asList("date".toLowerCase(), "日期"));
+        ParseParam parseParam = new ParseParam().setHeadLine(0).setStartLine(1)
+                .setFieldHeadMap(fieldHeadMap);
+        return parseParam;
+
+    }
+
+    @Test
+    public void testExcelHeadMap2003CN() {
+        String filePath = "file/test2003Head-CN.xls";
+        FileParse fileParse = FileParseCreateor.createFileParse(FileParseCommonUtil.findParserType(filePath));
+        List<ReflectVo> reflectVoList = fileParse.parseFile(filePath, ReflectVo.class, createHeadMapParam());
+        Assert.assertEquals(6, reflectVoList.size());
+    }
+
+    @Test
+    public void testExcelHeadMap2003EN() {
+        String filePath = "file/test2003Head-CN.xls";
+        FileParse fileParse = FileParseCreateor.createFileParse(FileParseCommonUtil.findParserType(filePath));
+        List<ReflectVo> reflectVoList = fileParse.parseFile(filePath, ReflectVo.class, createHeadMapParam());
+        Assert.assertEquals(6, reflectVoList.size());
+    }
 }
