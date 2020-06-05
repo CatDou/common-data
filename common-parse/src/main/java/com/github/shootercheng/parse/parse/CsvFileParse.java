@@ -26,6 +26,17 @@ public class CsvFileParse implements FileParse {
 
     private static final String SPLIT_REGEX = "[,\t]";
 
+    private CsvFileParse() {
+    }
+
+    private static class CsvFileParseHolder {
+        private static final CsvFileParse parser = new CsvFileParse();
+    }
+
+    public static CsvFileParse instance() {
+        return CsvFileParseHolder.parser;
+    }
+
     @Override
     public <T> List<T> parseFile(String filePath, Class<T> clazz, ParseParam parseParam) {
         // 校验入参

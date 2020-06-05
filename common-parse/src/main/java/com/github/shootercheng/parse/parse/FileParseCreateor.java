@@ -9,9 +9,9 @@ import com.github.shootercheng.parse.constant.ParseType;
 public class FileParseCreateor {
 
     private static final class FileParseHolder {
-        private static final FileParse CSV_FILE_PARSER = new CsvFileParse();
-        private static final FileParse EXCEL_FILE_PARSER = new ExcelFileParse();
-        private static final FileParse EASY_EXCEL_PARSER = new EasyExcelParse();
+        private static final FileParse CSV_FILE_PARSER = CsvFileParse.instance();
+        private static final FileParse EXCEL_FILE_PARSER = ExcelFileParse.instance();
+        private static final FileParse EASY_EXCEL_PARSER = EasyExcelParse.instance();
     }
 
     public static FileParse createFileParse(ParseType parseType) {

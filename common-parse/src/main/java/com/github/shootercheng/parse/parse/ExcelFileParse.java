@@ -27,6 +27,17 @@ import java.util.Set;
 public class ExcelFileParse implements FileParse {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelFileParse.class);
 
+    private ExcelFileParse() {
+    }
+
+    private static class ExcelFileParseHolder {
+        private static final ExcelFileParse parser = new ExcelFileParse();
+    }
+
+    public static ExcelFileParse instance() {
+        return ExcelFileParseHolder.parser;
+    }
+
     @Override
     public <T> List<T> parseFile(String filePath, Class<T> clazz, ParseParam parseParam) {
         Workbook workbook = null;

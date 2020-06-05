@@ -23,6 +23,17 @@ import java.util.Set;
 public class EasyExcelParse implements FileParse {
     private static final Logger LOGGER = LoggerFactory.getLogger(EasyExcelParse.class);
 
+    private EasyExcelParse() {
+    }
+
+    private static class EasyExcelParseHolder {
+        private static final EasyExcelParse parser = new EasyExcelParse();
+    }
+
+    public static EasyExcelParse instance() {
+        return EasyExcelParseHolder.parser;
+    }
+
     @Override
     public <T> List<T> parseFile(String filePath, Class<T> clazz, ParseParam parseParam) {
         List<T> resultList = new ArrayList<>();
