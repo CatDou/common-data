@@ -5,6 +5,7 @@ import com.github.catdou.parse.model.DemoData;
 import com.github.catdou.parse.model.ExcelTypeVo;
 import com.github.catdou.parse.model.LargeData;
 import com.github.catdou.parse.model.MergeDataVo;
+import com.github.catdou.parse.model.ReflectVo;
 import com.github.shootercheng.parse.constant.ParseType;
 import com.github.shootercheng.parse.param.ParseParam;
 import com.github.shootercheng.parse.parse.FileParse;
@@ -138,5 +139,23 @@ public class EasyExcelParseTest extends ParseCommonTest {
         FileParse fileParse = FileParseCreateor.createFileParse(ParseType.EASYEXCEL);
         Map<Integer, List<MergeDataVo>> resultMap = fileParse.parseFileSheets(filePath, MergeDataVo.class, map);
         System.out.println(resultMap);
+    }
+
+    @Test
+    public void testExcelHeadMap2003CN() {
+        String filePath = "file/test2003Head-CN.xls";
+        ParseParam parseParam = createHeadMapParam().setParseType(ParseType.EASYEXCEL);
+        FileParse fileParse = FileParseCreateor.createFileParse(FileParseCommonUtil.findParserType(filePath, parseParam));
+        List<ReflectVo> reflectVoList = fileParse.parseFile(filePath, ReflectVo.class, parseParam);
+        Assert.assertEquals(6, reflectVoList.size());
+    }
+
+    @Test
+    public void testExcelHeadMap2003EN() {
+        String filePath = "file/test2003Head-EN.xls";
+        ParseParam parseParam = createHeadMapParam().setParseType(ParseType.EASYEXCEL);
+        FileParse fileParse = FileParseCreateor.createFileParse(FileParseCommonUtil.findParserType(filePath, parseParam));
+        List<ReflectVo> reflectVoList = fileParse.parseFile(filePath, ReflectVo.class, parseParam);
+        Assert.assertEquals(6, reflectVoList.size());
     }
 }

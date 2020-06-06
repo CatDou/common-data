@@ -4,6 +4,7 @@ package com.github.shootercheng.parse.parse.event;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.metadata.CellData;
 import com.alibaba.excel.read.listener.ReadListener;
+import com.github.shootercheng.parse.constant.MapperType;
 import com.github.shootercheng.parse.param.ParseParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,15 +43,22 @@ public class ModelParserListener<T> implements ReadListener<Map<Integer, CellDat
 
     @Override
     public void invoke(Map<Integer, CellData> cellDataMap, AnalysisContext analysisContext) {
+        int rowIndex = analysisContext.readRowHolder().getRowIndex();
+        int headLine = parseParam.getHeadLine();
+        if (parseParam.getMapperType() == MapperType.HEAD && rowIndex == headLine) {
+            ModelParserCommon.buildParseParam(clazz, cellDataMap, parseParam);
+        }
+        int startLine = parseParam.getStartLine();
         // convert cell data to model
-        T t = ModelParserCommon.convertCellDataMapToVo(cellDataMap, analysisContext, clazz, parseParam);
-        if (t != null) {
-            resultList.add(t);
-        } else {
-                int rowIndex = analysisContext.readRowHolder().getRowIndex();
+        if (rowIndex >= startLine) {
+            T t = ModelParserCommon.convertCellDataMapToVo(cellDataMap, analysisContext, clazz, parseParam);
+            if (t != null) {
+                resultList.add(t);
+            } else {
                 parseParam.getErrorRecord()
                         .writeErrorMsg("line " + rowIndex + ":" + cellDataMap +
                                 "covert to null");
+            }
         }
         if (parseParam.getDataConsumer() != null) {
             if (resultList.size() >= parseParam.getBatchNum()) {

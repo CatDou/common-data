@@ -1,6 +1,7 @@
 package com.github.shootercheng.parse.parse;
 
 
+import com.github.shootercheng.parse.constant.MapperType;
 import com.github.shootercheng.parse.param.ParseParam;
 
 import java.util.List;
@@ -14,12 +15,15 @@ public interface FileParse {
     <T> List<T> parseFile(String filePath, Class<T> clazz, ParseParam parseParam);
 
     default void checkParam(ParseParam parseParam) {
-        boolean fieldSetter = parseParam.getFieldSetterMap() == null ||
-                parseParam.getFieldSetterMap().size() == 0;
-        boolean fieldHeadMap = parseParam.getFieldHeadMap() == null ||
-                parseParam.getFieldHeadMap().size() == 0;
-        if ( !fieldSetter || !fieldHeadMap) {
-            throw new IllegalArgumentException("please check field setter mapper");
+        MapperType mapperType = parseParam.getMapperType();
+        boolean fieldHeadMap = parseParam.getFieldHeadMap() != null &&
+                parseParam.getFieldHeadMap().size() > 0;
+        boolean fieldSetter = parseParam.getFieldSetterMap() != null &&
+                parseParam.getFieldSetterMap().size() > 0;
+        boolean checkHead = (MapperType.HEAD == mapperType) && fieldHeadMap;
+        boolean checkColumn = (MapperType.COLUMN == mapperType) && fieldSetter;
+        if ( !checkHead && !checkColumn ) {
+            throw new IllegalArgumentException("please check field setter mapper or field head mapper");
         }
     }
 

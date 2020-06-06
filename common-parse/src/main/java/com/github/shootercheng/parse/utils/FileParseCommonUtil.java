@@ -1,16 +1,19 @@
 package com.github.shootercheng.parse.utils;
 
+import com.github.shootercheng.common.util.DataUtil;
 import com.github.shootercheng.common.util.ReflectUtil;
 import com.github.shootercheng.common.util.StringUtils;
 import com.github.shootercheng.parse.constant.CommonConstant;
 import com.github.shootercheng.parse.constant.ParseType;
 import com.github.shootercheng.parse.exception.FileParseException;
+import com.github.shootercheng.parse.exception.ParamBuildException;
 import com.github.shootercheng.parse.param.ParseParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,6 +39,62 @@ public class FileParseCommonUtil {
             columnFieldSetter.put(column, allBeanSetter.get(fieldName));
         }
         return columnFieldSetter;
+    }
+
+    /**
+     * 根据 head 字段参数 匹配每一列对应的 setXX 方法
+     * @param clazz
+     * @param parseParam
+     * @param headMap
+     */
+    public static void buildParseParam(Class<?> clazz, ParseParam parseParam, Map<Integer, String> headMap) {
+        Map<String, List<String>> fieldHeadMap = parseParam.getFieldHeadMap();
+        Map<String, String> fieldColumnMap = new HashMap<>();
+        Set<Map.Entry<Integer, String>> entrySet = headMap.entrySet();
+        for (Map.Entry<Integer, String> entry : entrySet) {
+            Integer key = entry.getKey();
+            String excelColumn = DataUtil.COLUMN_NUM.get(key);
+            String head = entry.getValue();
+            String field = findHeadField(fieldHeadMap, head);
+            fieldColumnMap.put(excelColumn, field.toLowerCase());
+        }
+        Map<String, Method> columnSetterMap = FileParseCommonUtil.convertToColumnMethodMap(clazz, fieldColumnMap);
+        parseParam.setFieldSetterMap(columnSetterMap);
+
+    }
+
+    /**
+     * 找到当前 head 对应的 字段
+     * @param fieldHeadMap
+     * @param head
+     * @return 模型对应的字段
+     */
+    private static String findHeadField(Map<String, List<String>> fieldHeadMap, String head) {
+        Set<Map.Entry<String, List<String>>> entrySet = fieldHeadMap.entrySet();
+        String field = null;
+        for (Map.Entry<String, List<String>> entry : entrySet) {
+            String key = entry.getKey();
+            List<String> headList = entry.getValue();
+            if (isMatchHead(headList, head)) {
+                field = key;
+                break;
+            }
+        }
+        if (field == null) {
+            throw new ParamBuildException("file head ["+ head + "] can not map bean field, " +
+                    "please check field map config");
+        }
+        fieldHeadMap.remove(field);
+        return field;
+    }
+
+    private static boolean isMatchHead(List<String> headList, String head) {
+        for (String value : headList) {
+            if (value.equalsIgnoreCase(head)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static <T> void invokeValue( T t, Method method, String value) {
@@ -87,9 +146,8 @@ public class FileParseCommonUtil {
     public static ParseType findParserType(String filePath, ParseParam parseParam) {
         ParseType parseTypeFind = findParserType(filePath);
         // 如果参数 说明要 EasyExcel 解析就使用 Easy Excel
-        if (ParseType.EXCEL.name().equals(parseTypeFind.name())
-                && parseParam.getParseType() != null) {
-            if (ParseType.EASYEXCEL.name().equals(parseParam.getParseType().name())) {
+        if (ParseType.EXCEL == parseTypeFind && parseParam.getParseType() != null) {
+            if (ParseType.EASYEXCEL == parseParam.getParseType()) {
                 return ParseType.EASYEXCEL;
             }
         }

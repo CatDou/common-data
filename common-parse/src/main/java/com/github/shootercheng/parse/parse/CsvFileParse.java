@@ -2,6 +2,7 @@ package com.github.shootercheng.parse.parse;
 
 import com.github.shootercheng.common.util.DataUtil;
 import com.github.shootercheng.parse.constant.CommonConstant;
+import com.github.shootercheng.parse.constant.MapperType;
 import com.github.shootercheng.parse.exception.FileParseException;
 import com.github.shootercheng.parse.param.ParseParam;
 import com.github.shootercheng.parse.utils.FileParseCommonUtil;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +53,12 @@ public class CsvFileParse implements FileParse {
             int readLine = 0;
             String lineStr;
             while ( (lineStr = reader.readLine()) != null) {
-                if (readLine >= parseParam.getStartLine()) {
+                int headLine = parseParam.getHeadLine();
+                // 匹配 head
+                if (parseParam.getMapperType() == MapperType.HEAD && readLine == headLine) {
+                    Map<Integer, String> headMap = getHeadMap(lineStr);
+                    FileParseCommonUtil.buildParseParam(clazz, parseParam, headMap);
+                } else if (readLine >= parseParam.getStartLine()) {
                     String[] lineArr = splitCsvLine(lineStr);
                     T t = convertArrToVo(clazz, lineArr, parseParam);
                     if (t != null) {
@@ -87,6 +94,15 @@ public class CsvFileParse implements FileParse {
             }
         }
         return resultList;
+    }
+
+    private Map<Integer, String> getHeadMap(String lineStr) {
+        String[] lineArr = splitCsvLine(lineStr);
+        Map<Integer, String> headMap = new HashMap<>();
+        for (int i = 0; i < lineArr.length; i++) {
+            headMap.put(i, lineArr[i]);
+        }
+        return headMap;
     }
 
     private <T> T convertArrToVo(Class<T> clazz, String[] inputArr, ParseParam parseParam) {
@@ -129,7 +145,7 @@ public class CsvFileParse implements FileParse {
                     String jstr = inputArr[j];
                     i++;
                     if (jstr.length() > 0 && jstr.charAt(0) != '"' && jstr.charAt(jstr.length() - 1) == '"') {
-                        mergeStr.append(jstr.substring(0, jstr.length() - 1));
+                        mergeStr.append(jstr, 0, jstr.length() - 1);
                         break;
                     } else {
                         mergeStr.append(jstr).append(";");

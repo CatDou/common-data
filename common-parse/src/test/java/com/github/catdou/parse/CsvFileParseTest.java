@@ -13,6 +13,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +87,23 @@ public class CsvFileParseTest extends ParseCommonTest {
         ParseParam parseParam = new ParseParam().setStartLine(1)
                 .setFieldSetterMap(columnMethodMap);
         return parseParam;
+    }
 
+    @Test
+    public void testExcelHeadMap2003CN() {
+        String filePath = "file/testHead-CN.csv";
+        FileParse fileParse = FileParseCreateor.createFileParse(FileParseCommonUtil.findParserType(filePath));
+        ParseParam parseParam = createHeadMapParam().setEncode(StandardCharsets.UTF_8.name());
+        List<ReflectVo> reflectVoList = fileParse.parseFile(filePath, ReflectVo.class, parseParam);
+        Assert.assertEquals(6, reflectVoList.size());
+    }
+
+    @Test
+    public void testExcelHeadMap2003EN() {
+        String filePath = "file/testHead-EN.csv";
+        FileParse fileParse = FileParseCreateor.createFileParse(FileParseCommonUtil.findParserType(filePath));
+        ParseParam parseParam = createHeadMapParam().setEncode(StandardCharsets.UTF_8.name());
+        List<ReflectVo> reflectVoList = fileParse.parseFile(filePath, ReflectVo.class, parseParam);
+        Assert.assertEquals(6, reflectVoList.size());
     }
 }

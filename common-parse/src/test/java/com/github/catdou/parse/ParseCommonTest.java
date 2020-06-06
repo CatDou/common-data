@@ -7,7 +7,9 @@ import com.github.shootercheng.parse.param.ParseParam;
 import com.github.shootercheng.parse.utils.FileParseCommonUtil;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,6 +42,17 @@ public class ParseCommonTest {
         Map<String, Method> columnMethodMap = FileParseCommonUtil.convertToColumnMethodMap(ExcelTypeVo.class, fieldColumnMap);
         ParseParam parseParam = new ParseParam().setStartLine(1)
                 .setFieldSetterMap(columnMethodMap);
+        return parseParam;
+    }
+
+    public ParseParam createHeadMapParam() {
+        Map<String, List<String>> fieldHeadMap = new HashMap<>(16);
+        fieldHeadMap.put("id", Arrays.asList("id", "序号"));
+        fieldHeadMap.put("userName", Arrays.asList("userName", "姓名"));
+        fieldHeadMap.put("score", Arrays.asList("score", "分数"));
+        fieldHeadMap.put("date", Arrays.asList("date", "日期"));
+        ParseParam parseParam = new ParseParam().setHeadLine(0).setStartLine(1)
+                .setFieldHeadMap(fieldHeadMap);
         return parseParam;
     }
 }

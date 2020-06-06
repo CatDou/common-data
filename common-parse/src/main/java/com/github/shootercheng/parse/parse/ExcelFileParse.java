@@ -2,8 +2,8 @@ package com.github.shootercheng.parse.parse;
 
 import com.github.shootercheng.common.util.DataUtil;
 import com.github.shootercheng.common.util.ExcelUtil;
+import com.github.shootercheng.parse.constant.MapperType;
 import com.github.shootercheng.parse.exception.FileParseException;
-import com.github.shootercheng.parse.exception.ParamBuildException;
 import com.github.shootercheng.parse.param.ParseParam;
 import com.github.shootercheng.parse.utils.FileParseCommonUtil;
 import org.apache.poi.ss.usermodel.Row;
@@ -40,6 +40,7 @@ public class ExcelFileParse implements FileParse {
 
     @Override
     public <T> List<T> parseFile(String filePath, Class<T> clazz, ParseParam parseParam) {
+        checkParam(parseParam);
         Workbook workbook = null;
         List<T> resultList = new ArrayList<>();
         try {
@@ -66,11 +67,10 @@ public class ExcelFileParse implements FileParse {
         int startLine = parseParam.getStartLine();
         int i = 0;
         for (Row row : sheet) {
-            if (i == headLine && parseParam.getFieldHeadMap() != null) {
+            if ( parseParam.getMapperType() == MapperType.HEAD && i == headLine ) {
                 Map<Integer, String> headMap = getHeadMap(row);
-                buildParseParam(clazz, parseParam, headMap);
-            }
-            if (i >= startLine) {
+                FileParseCommonUtil.buildParseParam(clazz, parseParam, headMap);
+            } else if (i >= startLine) {
                 T t = convertRowToVo(clazz, row, parseParam);
                 if (t != null) {
                     resultList.add(t);
@@ -82,46 +82,6 @@ public class ExcelFileParse implements FileParse {
             }
             i++;
         }
-    }
-
-    private void buildParseParam(Class<?> clazz, ParseParam parseParam, Map<Integer, String> headMap) {
-        Map<String, List<String>> fieldHeadMap = parseParam.getFieldHeadMap();
-        Map<String, String> fieldColumnMap = new HashMap<>();
-        Set<Map.Entry<Integer, String>> entrySet = headMap.entrySet();
-        for (Map.Entry<Integer, String> entry : entrySet) {
-            Integer key = entry.getKey();
-            String excelColumn = DataUtil.COLUMN_NUM.get(key);
-            String head = entry.getValue().toLowerCase();
-            String field = findHeadField(fieldHeadMap, head);
-            fieldColumnMap.put(excelColumn, field.toLowerCase());
-        }
-        Map<String, Method> columnSetterMap = FileParseCommonUtil.convertToColumnMethodMap(clazz, fieldColumnMap);
-        parseParam.setFieldSetterMap(columnSetterMap);
-
-    }
-
-    /**
-     * 找到当前 head 对应的 字段
-     * @param fieldHeadMap
-     * @param head
-     * @return 模型对应的字段
-     */
-    private String findHeadField(Map<String, List<String>> fieldHeadMap, String head) {
-        Set<Map.Entry<String, List<String>>> entrySet = fieldHeadMap.entrySet();
-        String field = null;
-        for (Map.Entry<String, List<String>> entry : entrySet) {
-            String key = entry.getKey();
-            List<String> headList = entry.getValue();
-            if (headList.contains(head)) {
-                field = key;
-                break;
-            }
-        }
-        if (field == null) {
-            throw new ParamBuildException("excel head can not map field, please check field map config");
-        }
-        fieldHeadMap.remove(field);
-        return field;
     }
 
     private Map<Integer, String> getHeadMap(Row row) {

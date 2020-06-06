@@ -1,12 +1,11 @@
 package com.github.shootercheng.common.util;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.NumberToTextConverter;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,11 +114,8 @@ public class ExcelUtil {
             // 转换为 long 时间
             cellValue = "L" + date.getTime();
         } else {
-            if (cell instanceof HSSFCell) {
-                HSSFCell hssfCell = (HSSFCell) cell;
-                hssfCell.setCellType(CellType.STRING);
-                cellValue = hssfCell.getStringCellValue();
-            }
+            double doubleValue = cell.getNumericCellValue();
+            cellValue = NumberToTextConverter.toText(doubleValue);
         }
         return cellValue;
     }

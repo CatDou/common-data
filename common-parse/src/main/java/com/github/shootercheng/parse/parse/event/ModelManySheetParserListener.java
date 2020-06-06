@@ -3,6 +3,7 @@ package com.github.shootercheng.parse.parse.event;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.metadata.CellData;
 import com.alibaba.excel.read.listener.ReadListener;
+import com.github.shootercheng.parse.constant.MapperType;
 import com.github.shootercheng.parse.param.ParseParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,10 @@ public class ModelManySheetParserListener<T> implements ReadListener<Map<Integer
             if (resultList == null) {
                 resultList = new ArrayList<>();
                 resultMap.put(sheetNo, resultList);
+            }
+            int headLine = parseParam.getHeadLine();
+            if (parseParam.getMapperType() == MapperType.HEAD && rowIndex == headLine) {
+                ModelParserCommon.buildParseParam(clazz, cellDataMap, parseParam);
             }
             if (rowIndex >= parseParam.getStartLine()) {
                 parseModelToResultList(cellDataMap, analysisContext, parseParam, resultList);

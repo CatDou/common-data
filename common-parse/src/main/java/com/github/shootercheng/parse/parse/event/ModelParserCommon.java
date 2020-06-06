@@ -12,7 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author chengdu
@@ -71,5 +73,16 @@ public class ModelParserCommon {
             e.printStackTrace();
         }
         return t;
+    }
+
+    public static void buildParseParam(Class<?> clazz, Map<Integer, CellData> cellDataMap, ParseParam parseParam) {
+        Set<Map.Entry<Integer, CellData>> entrySet = cellDataMap.entrySet();
+        Map<Integer, String> headMap = new HashMap<>();
+        for (Map.Entry<Integer, CellData> entry : entrySet) {
+            Integer key = entry.getKey();
+            String cellDataValue = entry.getValue().toString();
+            headMap.put(key, cellDataValue);
+        }
+        FileParseCommonUtil.buildParseParam(clazz, parseParam, headMap);
     }
 }

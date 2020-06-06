@@ -1,5 +1,6 @@
 package com.github.shootercheng.parse.param;
 
+import com.github.shootercheng.parse.constant.MapperType;
 import com.github.shootercheng.parse.constant.ParseType;
 import com.github.shootercheng.parse.parse.consumer.DataConsumer;
 import com.github.shootercheng.parse.parse.define.CellFormat;
@@ -40,6 +41,8 @@ public class ParseParam {
 
     private int batchNum = 1000;
 
+    private MapperType mapperType;
+
     public ParseParam() {
         errorRecord = new DefaultErrorRecord(new StringBuilder());
     }
@@ -56,6 +59,7 @@ public class ParseParam {
 
     public ParseParam setFieldSetterMap(Map<String, Method> fieldSetterMap) {
         this.fieldSetterMap = fieldSetterMap;
+        this.mapperType = MapperType.COLUMN;
         return this;
     }
 
@@ -149,6 +153,11 @@ public class ParseParam {
 
     public ParseParam setFieldHeadMap(Map<String, List<String>> fieldHeadMap) {
         this.fieldHeadMap = fieldHeadMap;
+        this.mapperType = MapperType.HEAD;
         return this;
+    }
+
+    public MapperType getMapperType() {
+        return mapperType;
     }
 }

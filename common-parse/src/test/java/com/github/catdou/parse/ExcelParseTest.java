@@ -17,6 +17,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -110,32 +111,53 @@ public class ExcelParseTest extends ParseCommonTest {
     }
 
     @Test
-    public void testPoi() {
+    public void testPoi2003() {
         String filePath = "file/test2003.xls";
+        List<List<String>> list = getRowInfo(filePath);
+        Assert.assertTrue(list.size() > 0);
+    }
+
+    @Test
+    public void testPoi2007() {
+        String fileXlsxPath = "file/test2007.xlsx";
+        List<List<String>> xlsxList = getRowInfo(fileXlsxPath);
+        System.out.println(xlsxList);
+    }
+
+    @Test
+    public void testExcelToCsvFormat() {
+        String filePath = "file/test2003Head-CN.xls";
+        printCsvFormat(filePath);
+        filePath = "file/test2003Head-EN.xls";
+        printCsvFormat(filePath);
+    }
+
+    private List<List<String>> getRowInfo(String filePath) {
+        Workbook workbook = ExcelUtil.getWorkBook(filePath);
+        Sheet sheet = workbook.getSheetAt(0);
+        List<List<String>> resultList = new ArrayList<>();
+        for (Row row : sheet) {
+            List<String> rowList = new ArrayList<>();
+            row.forEach(cell -> {
+                String cellValue = ExcelUtil.getCellValue(cell);
+                rowList.add(cellValue);
+            });
+            resultList.add(rowList);
+        }
+        return resultList;
+    }
+
+    private void printCsvFormat(String filePath) {
         Workbook workbook = ExcelUtil.getWorkBook(filePath);
         Sheet sheet = workbook.getSheetAt(0);
         for (Row row : sheet) {
-            int rowNum = row.getRowNum();
-            System.out.println("row :" + rowNum);
-            StringJoiner stringJoiner = new StringJoiner(",","(",")");
+            StringJoiner stringJoiner = new StringJoiner(",");
             row.forEach(cell -> {
                 String cellValue = ExcelUtil.getCellValue(cell);
                 stringJoiner.add(cellValue);
             });
             System.out.println(stringJoiner);
         }
-    }
-
-    public ParseParam createHeadMapParam() {
-        Map<String, List<String>> fieldHeadMap = new HashMap<>(16);
-        fieldHeadMap.put("id", Arrays.asList("id".toLowerCase(), "序号"));
-        fieldHeadMap.put("userName", Arrays.asList("userName".toLowerCase(), "姓名"));
-        fieldHeadMap.put("score", Arrays.asList("score".toLowerCase(), "分数"));
-        fieldHeadMap.put("date", Arrays.asList("date".toLowerCase(), "日期"));
-        ParseParam parseParam = new ParseParam().setHeadLine(0).setStartLine(1)
-                .setFieldHeadMap(fieldHeadMap);
-        return parseParam;
-
     }
 
     @Test
@@ -148,9 +170,27 @@ public class ExcelParseTest extends ParseCommonTest {
 
     @Test
     public void testExcelHeadMap2003EN() {
-        String filePath = "file/test2003Head-CN.xls";
+        String filePath = "file/test2003Head-EN.xls";
         FileParse fileParse = FileParseCreateor.createFileParse(FileParseCommonUtil.findParserType(filePath));
         List<ReflectVo> reflectVoList = fileParse.parseFile(filePath, ReflectVo.class, createHeadMapParam());
         Assert.assertEquals(6, reflectVoList.size());
+    }
+
+    @Test
+    public void testErrorParam() {
+        Map<String, List<String>> fieldHeadMap = new HashMap<>(16);
+        fieldHeadMap.put("id", Arrays.asList("id", "序号"));
+        fieldHeadMap.put("userName", Arrays.asList("userName", "姓名"));
+        fieldHeadMap.put("score", Arrays.asList("score", "分数"));
+        fieldHeadMap.put("date", Arrays.asList("date", "日期"));
+        ParseParam parseParam = new ParseParam().setHeadLine(0).setStartLine(1);
+        String filePath = "file/test2003Head-CN.xls";
+        FileParse fileParse = FileParseCreateor.createFileParse(ParseType.EXCEL);
+        try {
+            List<ReflectVo> reflectVoList = fileParse.parseFile(filePath, ReflectVo.class, parseParam);
+            Assert.fail("check param error ........");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
