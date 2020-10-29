@@ -106,4 +106,12 @@ public class CsvFileParseTest extends ParseCommonTest {
         List<ReflectVo> reflectVoList = fileParse.parseFile(filePath, ReflectVo.class, parseParam);
         Assert.assertEquals(6, reflectVoList.size());
     }
+
+    @Test
+    public void testCsvHeadNewLineParse() {
+        String filePath = "file/test_head_line.csv";
+        FileParse fileParse = FileParseCreateor.createFileParse(FileParseCommonUtil.findParserType(filePath));
+        List<ReflectVo> reflectVoList = fileParse.parseFile(filePath, ReflectVo.class, createReflectParam());
+        Assert.assertEquals(6, reflectVoList.size());
+    }
 }

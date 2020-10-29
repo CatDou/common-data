@@ -43,8 +43,11 @@ public class ParseParam {
 
     private MapperType mapperType;
 
+    private CsvParam csvParam;
+
     public ParseParam() {
         errorRecord = new DefaultErrorRecord(new StringBuilder());
+        csvParam = new CsvParam();
     }
 
     public ParseParam setStartLine(int startLine) {
@@ -159,5 +162,13 @@ public class ParseParam {
 
     public MapperType getMapperType() {
         return mapperType;
+    }
+
+    public CsvParam getCsvParam() {
+        return csvParam;
+    }
+
+    public void setCsvParam(CsvParam csvParam) {
+        this.csvParam = csvParam;
     }
 }
